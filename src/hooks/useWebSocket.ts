@@ -19,6 +19,18 @@ export const useWebSocket = () => {
     if (!token || !user) return
 
     const configuredWsBase = (import.meta.env.VITE_WS_URL || '').replace(/\/$/, '')
+
+    // On HTTPS deployments (like Vercel), serverless does not support persistent WebSocket connections.
+    // Connect only if a dedicated secure WebSocket URL (wss://) is provided via VITE_WS_URL,
+    // or when running locally in development (http:).
+    if (window.location.protocol === 'https:' && !configuredWsBase.startsWith('wss://')) {
+      console.info(
+        '[WS] Live notifications over WebSocket skipped: Vercel serverless does not support persistent WebSocket connections. ' +
+        'Configure VITE_WS_URL with a wss:// endpoint to enable real-time updates in production.'
+      )
+      return
+    }
+
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
     const wsUrl = configuredWsBase
       ? `${configuredWsBase}/ws/websocket`
