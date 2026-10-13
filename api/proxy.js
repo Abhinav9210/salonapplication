@@ -97,6 +97,8 @@ export default async function handler(req, res) {
       'upgrade',
       'host',
       'content-length',
+      'origin',
+      'referer',
     ])
 
     const forwardHeaders = {}
@@ -125,6 +127,15 @@ export default async function handler(req, res) {
           if (!hopByHopHeaders.has(lowerKey)) {
             responseHeaders[key] = value
           }
+        }
+
+        // Attach CORS response headers so any browser client or Vercel preview domain is permitted
+        const clientOrigin = req.headers.origin
+        if (clientOrigin) {
+          responseHeaders['access-control-allow-origin'] = clientOrigin
+          responseHeaders['access-control-allow-credentials'] = 'true'
+          responseHeaders['access-control-allow-methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD'
+          responseHeaders['access-control-allow-headers'] = 'Content-Type, Authorization, X-Requested-With, Accept'
         }
 
         res.writeHead(proxyRes.statusCode || 200, responseHeaders)
