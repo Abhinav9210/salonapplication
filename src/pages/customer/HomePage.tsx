@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search, ArrowRight, Zap, Star, Shield, Clock, TrendingUp, X } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchApprovedSalons, fetchTopRated, searchSalons } from '../../features/salon/salonSlice'
@@ -9,7 +9,7 @@ import Footer from '../../components/layout/Footer'
 
 const FEATURES = [
   { icon: <Zap size={22} />,       title: 'Instant Booking',  desc: 'Book in seconds with real-time slot availability.' },
-  { icon: <Shield size={22} />,    title: 'Secure Payments',  desc: 'Pay the booking fee online; rest at the salon.' },
+  { icon: <Shield size={22} />,    title: 'Hassle-Free Booking', desc: 'Reserve your appointment with no upfront payment.' },
   { icon: <Star size={22} />,      title: 'Verified Reviews', desc: 'Genuine ratings from real customers.' },
   { icon: <Clock size={22} />,     title: 'Flexible Slots',   desc: 'Choose any time from dynamically generated slots.' },
 ]
@@ -18,14 +18,24 @@ const STATS = [['500+', 'Salons'], ['10K+', 'Bookings'], ['4.8★', 'Avg Rating'
 
 const HomePage = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const { user } = useAppSelector(s => s.auth)
   const { salons, topRated, loading, searchResults } = useAppSelector(s => s.salon)
   const [query,    setQuery]    = useState('')
   const [searched, setSearched] = useState(false)
 
   useEffect(() => {
+    if (user?.role === 'OWNER') {
+      navigate('/dashboard/owner', { replace: true })
+      return
+    }
+    if (user?.role === 'BARBER') {
+      navigate('/dashboard/barber', { replace: true })
+      return
+    }
     dispatch(fetchApprovedSalons({ page: 0, size: 8 }))
     dispatch(fetchTopRated())
-  }, [])
+  }, [user, navigate, dispatch])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

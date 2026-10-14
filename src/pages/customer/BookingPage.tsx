@@ -17,7 +17,7 @@ import BarberCard from '../../components/common/BarberCard'
 import Navbar from '../../components/layout/Navbar'
 import { useParams } from 'react-router-dom'
 
-const STEPS = ['Select Barber', 'Select Service', 'Pick Slot', 'Payment', 'Confirm']
+const STEPS = ['Select Barber', 'Select Service', 'Pick Slot', 'Confirm']
 
 const BookingPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -32,7 +32,6 @@ const BookingPage = () => {
   const [services, setServices] = useState<SalonService[]>([])
   const [slots, setSlots] = useState<TimeSlot[]>([])
   const [selectedDate, setSelectedDate] = useState(format(new Date(), 'yyyy-MM-dd'))
-  const [paymentMode, setPaymentMode] = useState<'ONLINE_FULL' | 'ONLINE_FEE_CASH_REMAINING'>('ONLINE_FEE_CASH_REMAINING')
   const [notes, setNotes] = useState('')
 
   useEffect(() => {
@@ -71,7 +70,7 @@ const BookingPage = () => {
       barberId: selectedBarberId,
       serviceId: selectedServiceId,
       slotId: selectedSlotId,
-      paymentMode,
+      paymentMode: 'ONLINE_FEE_CASH_REMAINING',
       notes,
     }))
     if (createBooking.fulfilled.match(res)) {
@@ -190,55 +189,41 @@ const BookingPage = () => {
               </div>
             )}
 
-            {/* Step 3: Payment */}
+            {/* Step 3: Confirm */}
             {bookingStep === 3 && (
-              <div>
-                <h2 className="section-title text-xl sm:text-2xl mb-4">Payment Mode</h2>
-                <div className="space-y-3 mb-6">
-                  {[
-                    { value: 'ONLINE_FEE_CASH_REMAINING', label: '💳 Pay Booking Fee Online', desc: `Pay ₹${currentSalon?.minimumBookingFee} now, rest at salon` },
-                    { value: 'ONLINE_FULL', label: '✅ Pay Full Amount Online', desc: `Pay ₹${selectedService?.price} now` },
-                  ].map(opt => (
-                    <div key={opt.value} onClick={() => setPaymentMode(opt.value as typeof paymentMode)}
-                      className={`p-4 rounded-xl border cursor-pointer transition-all ${
-                        paymentMode === opt.value
-                          ? 'border-primary-500 bg-primary-600/10'
-                          : 'border-white/5 glass-card hover:border-white/15'
-                      }`}>
-                      <p className={`font-semibold text-sm ${paymentMode === opt.value ? 'text-primary-300' : 'text-white'}`}>{opt.label}</p>
-                      <p className="text-xs text-slate-400 mt-0.5">{opt.desc}</p>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <label className="text-xs text-slate-400 font-medium mb-1.5 block">Special Note (optional)</label>
-                  <textarea rows={3} value={notes} onChange={e => setNotes(e.target.value)}
-                    placeholder="Any special requests..."
-                    className="input-field resize-none" />
-                </div>
-              </div>
-            )}
-
-            {/* Step 4: Confirm */}
-            {bookingStep === 4 && (
               <div>
                 <h2 className="section-title text-xl sm:text-2xl mb-6">Confirm Your Booking</h2>
                 <div className="space-y-3">
                   {[
                     ['Salon', currentSalon?.name],
                     ['Barber', selectedBarber?.name],
-                    ['Service', `${selectedService?.name} — ₹${selectedService?.price}`],
+                    ['Service', selectedService ? `${selectedService.name} — ₹${selectedService.price}` : ''],
                     ['Date', selectedDate],
-                    ['Time', `${selectedSlot?.startTime} – ${selectedSlot?.endTime}`],
-                    ['Payment', paymentMode === 'ONLINE_FULL' ? 'Full Online' : `₹${currentSalon?.minimumBookingFee} now + rest at salon`],
-                  ].map(([label, value]) => (
+                    ['Time', selectedSlot ? `${selectedSlot.startTime} – ${selectedSlot.endTime}` : ''],
+                    ['Total Amount', selectedService ? `₹${selectedService.price}` : ''],
+                  ].filter(([_, value]) => Boolean(value)).map(([label, value]) => (
                     <div key={label} className="flex flex-col xs:flex-row xs:items-center justify-between py-2.5 border-b border-white/5 text-sm gap-1">
                       <span className="text-slate-400 text-xs sm:text-sm">{label}</span>
                       <span className="text-white font-medium text-left xs:text-right">{value}</span>
                     </div>
                   ))}
                 </div>
-                <div className="mt-6 p-4 rounded-xl bg-primary-600/10 border border-primary-600/25 text-xs text-slate-300 leading-relaxed">
+
+                <div className="mt-5">
+                  <label htmlFor="booking-notes" className="text-xs text-slate-400 font-medium mb-1.5 block">
+                    Special Note (optional)
+                  </label>
+                  <textarea
+                    id="booking-notes"
+                    rows={2}
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="Any special requests or instructions..."
+                    className="input-field resize-none text-xs sm:text-sm"
+                  />
+                </div>
+
+                <div className="mt-5 p-4 rounded-xl bg-primary-600/10 border border-primary-600/25 text-xs text-slate-300 leading-relaxed">
                   By confirming, you agree to the booking terms. Your slot will be held for 30 minutes pending salon approval.
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Search, SlidersHorizontal, X, MapPin, Star } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { fetchApprovedSalons, searchSalons } from '../../features/salon/salonSlice'
@@ -27,6 +28,8 @@ const sortSalons = (salons: Salon[], sort: SortOption) => {
 
 const SalonsListPage = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const { user } = useAppSelector(s => s.auth)
   const { salons, searchResults, loading, totalPages } = useAppSelector(s => s.salon)
   const [query,    setQuery]    = useState('')
   const [page,     setPage]     = useState(0)
@@ -36,8 +39,16 @@ const SalonsListPage = () => {
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   useEffect(() => {
+    if (user?.role === 'OWNER') {
+      navigate('/dashboard/owner', { replace: true })
+      return
+    }
+    if (user?.role === 'BARBER') {
+      navigate('/dashboard/barber', { replace: true })
+      return
+    }
     dispatch(fetchApprovedSalons({ page, size: 12 }))
-  }, [page])
+  }, [user, navigate, page])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()

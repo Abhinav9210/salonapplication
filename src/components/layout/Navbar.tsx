@@ -75,7 +75,9 @@ const Navbar = () => {
           {!isDashboard && (
             <div className="hidden md:flex items-center gap-1">
               <NavPill to="/" icon={<Home size={15} />} label="Home" />
-              <NavPill to="/salons" icon={<Store size={15} />} label="Salons" />
+              {(!user || user.role === 'CUSTOMER') && (
+                <NavPill to="/salons" icon={<Store size={15} />} label="Salons" />
+              )}
               {isAuthenticated && <NavPill to={dashboardPath} icon={<LayoutDashboard size={15} />} label="Dashboard" />}
             </div>
           )}
@@ -155,7 +157,9 @@ const Navbar = () => {
         <div className="md:hidden border-t border-white/5 px-4 py-3 space-y-1.5 animate-fade-in pb-safe"
           style={{ background: 'rgba(10,15,30,0.98)', backdropFilter: 'blur(20px)' }}>
           <MobileLink to="/" icon={<Home size={18} />} label="Home" onClick={() => setMobileMenuOpen(false)} />
-          <MobileLink to="/salons" icon={<Store size={18} />} label="Browse Salons" onClick={() => setMobileMenuOpen(false)} />
+          {(!user || user.role === 'CUSTOMER') && (
+            <MobileLink to="/salons" icon={<Store size={18} />} label="Browse Salons" onClick={() => setMobileMenuOpen(false)} />
+          )}
           {isAuthenticated ? (
             <>
               <MobileLink to={dashboardPath} icon={<LayoutDashboard size={18} />} label="Dashboard" onClick={() => setMobileMenuOpen(false)} />

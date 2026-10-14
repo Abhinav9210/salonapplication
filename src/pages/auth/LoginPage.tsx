@@ -1,23 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Scissors, Mail, Lock, Loader2, Zap } from 'lucide-react'
+import { Eye, EyeOff, Scissors, Mail, Lock, Loader2 } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { login } from '../../features/auth/authSlice'
-
-// Demo accounts match the seeded data in DataInitializer.java
-const DEMO_ACCOUNTS = [
-  { role: 'CUSTOMER', label: 'Customer',  email: 'customer@salonease.com' },
-  { role: 'OWNER',    label: 'Owner',     email: 'owner@salonease.com'    },
-  { role: 'BARBER',   label: 'Barber',    email: 'barber@salonease.com'   },
-  { role: 'ADMIN',    label: 'Admin',     email: 'salonadmin@gmail.com'   },
-]
-const DEMO_PASSWORD = 'Password@123'
 
 const LoginPage = () => {
   const dispatch    = useAppDispatch()
   const navigate    = useNavigate()
   const location    = useLocation()
-  const { loading } = useAppSelector(s => s.auth)
+  const { user, loading } = useAppSelector(s => s.auth)
   const [form, setForm]       = useState({ email: '', password: '' })
   const [showPass, setShowPass] = useState(false)
 
@@ -32,22 +23,31 @@ const LoginPage = () => {
     SUPERADMIN: '/dashboard/admin',
   }
 
-  // ── Auth logic preserved exactly ──────────────────────────────────────────
+  useEffect(() => {
+    if (user) {
+      const dest = roleDestMap[user.role] || '/dashboard/customer'
+      navigate(dest, { replace: true })
+    }
+  }, [user, navigate])
+
+  // ── Auth logic preserved and role redirection enforced ───────────────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const res = await dispatch(login(form))
     if (login.fulfilled.match(res)) {
       const role: string = res.payload.role
-      const dest = from || roleDestMap[role] || '/'
-      navigate(dest)
+      // OWNER, BARBER, and ADMIN are redirected directly to their dashboards immediately.
+      // CUSTOMER can return to their intended destination if valid (e.g. salon booking) or customer dashboard.
+      let dest = roleDestMap[role] || '/dashboard/customer'
+      if (role === 'CUSTOMER' && from && !from.startsWith('/dashboard/owner') && !from.startsWith('/dashboard/barber') && !from.startsWith('/dashboard/admin') && from !== '/') {
+        dest = from
+      }
+      navigate(dest, { replace: true })
     }
   }
 
-  const fillDemo = (email: string) =>
-    setForm({ email, password: email === 'salonadmin@gmail.com' ? 'salonadmin1408' : DEMO_PASSWORD })
-
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-mesh relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-mesh relative overflow-hidden">
       {/* Ambient glow */}
       <div className="glow-orb w-[500px] h-[500px] bg-primary-700 -top-60 -left-60" />
       <div className="glow-orb w-[400px] h-[400px] bg-accent -bottom-40 -right-40" />
@@ -125,36 +125,9 @@ const LoginPage = () => {
                 : 'Sign In'}
             </button>
           </form>
-
-          {/* Demo accounts */}
-          <div className="mt-6 sm:mt-7">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="flex-1 h-px bg-white/5" />
-              <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
-                <Zap size={11} className="text-primary-400" /> Quick demo login
-              </span>
-              <div className="flex-1 h-px bg-white/5" />
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map(a => (
-                <button
-                  key={a.role}
-                  type="button"
-                  onClick={() => fillDemo(a.email)}
-                  className="text-xs px-3 py-2.5 rounded-xl text-slate-300 hover:text-white border border-white/5 hover:border-primary-600/40 hover:bg-primary-600/10 transition-all text-left min-h-[44px] flex flex-col justify-center active:scale-[0.98]"
-                >
-                  <span className="block font-semibold text-white">{a.label}</span>
-                  <span className="text-slate-500 text-[10px] truncate block">{a.email}</span>
-                </button>
-              ))}
-            </div>
-            <p className="text-center text-xs text-slate-500 mt-2.5">
-              All demo accounts use password: <code className="text-slate-300 bg-white/5 px-1.5 py-0.5 rounded font-mono text-[11px]">Password@123</code>
-            </p>
-          </div>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-5">
+        <p className="text-center text-sm text-slate-500 mt-6">
           Don't have an account?{' '}
           <Link to="/register" className="text-primary-400 hover:text-primary-300 font-medium transition-colors">
             Create one

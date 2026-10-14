@@ -38,7 +38,6 @@ const RegisterPage = () => {
   const roles = [
     { value: 'CUSTOMER', label: 'Customer', desc: 'Book appointments' },
     { value: 'OWNER', label: 'Salon Owner', desc: 'Manage your salon' },
-    { value: 'BARBER', label: 'Barber', desc: 'Manage your bookings' },
   ]
 
   return (
@@ -59,7 +58,7 @@ const RegisterPage = () => {
         <div className="glass-card p-5 sm:p-8 rounded-2xl shadow-card">
           <div className="mb-6">
             <label className="text-xs text-slate-400 font-medium mb-2 block">I am a...</label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
               {roles.map(r => (
                 <button key={r.value} type="button"
                   onClick={() => setForm({ ...form, role: r.value })}

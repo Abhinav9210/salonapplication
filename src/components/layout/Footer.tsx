@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Mail, Phone, MapPin, Scissors } from 'lucide-react'
+import { Mail, MapPin, Scissors } from 'lucide-react'
 
 const Footer = () => (
   <footer className="border-t border-white/5 mt-20" style={{ background: '#0a0f1e' }}>
@@ -61,10 +61,7 @@ const Footer = () => (
           <h4 className="text-white font-semibold text-sm mb-4">Contact</h4>
           <ul className="space-y-3">
             <li className="flex items-center gap-2 text-slate-500 text-sm">
-              <Mail size={14} className="text-primary-500" /> support@salonease.com
-            </li>
-            <li className="flex items-center gap-2 text-slate-500 text-sm">
-              <Phone size={14} className="text-primary-500" /> +91 98765 43210
+              <Mail size={14} className="text-primary-500" /> salonadmin546@gmail.com
             </li>
             <li className="flex items-center gap-2 text-slate-500 text-sm">
               <MapPin size={14} className="text-primary-500" /> Bangalore, India

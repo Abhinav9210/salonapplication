@@ -7,7 +7,7 @@ import Sidebar from '../../components/layout/Sidebar'
 import Navbar from '../../components/layout/Navbar'
 import StatCard from '../../components/common/StatCard'
 import { barberApi } from '../../api/index'
-import { Calendar, Clock, CheckCircle, XCircle, ToggleLeft, ToggleRight, AlertCircle } from 'lucide-react'
+import { Calendar, Clock, CheckCircle, XCircle, ToggleLeft, ToggleRight, AlertCircle, Store } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const BarberDashboard = () => {
@@ -18,6 +18,7 @@ const BarberDashboard = () => {
 
   const [barberId, setBarberId] = useState<number | null>(null)
   const [barberName, setBarberName] = useState('')
+  const [salonName, setSalonName] = useState('')
   const [isAvailable, setIsAvailable] = useState(true)
   const [profileError, setProfileError] = useState(false)
   const [profileLoading, setProfileLoading] = useState(true)
@@ -32,6 +33,7 @@ const BarberDashboard = () => {
         const b = res.data.data
         setBarberId(b.id)
         setBarberName(b.name || user?.name || 'Barber')
+        if (b.salonName) setSalonName(b.salonName)
         setIsAvailable(b.isAvailable ?? b.available ?? false)
         setProfileError(false)
         // Step 2: load bookings using real barber entity ID
@@ -87,7 +89,14 @@ const BarberDashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h1 className="text-2xl font-display font-bold text-white">Barber Dashboard</h1>
-              <p className="text-slate-400 text-sm mt-1">Welcome, {barberName || user?.name}</p>
+              <div className="flex flex-wrap items-center gap-2 mt-1">
+                <p className="text-slate-400 text-sm">Welcome, {barberName || user?.name}</p>
+                {salonName && (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary-600/20 text-primary-300 border border-primary-600/30">
+                    <Store size={12} /> Assigned Salon: {salonName}
+                  </span>
+                )}
+              </div>
             </div>
             {barberId && (
               <button

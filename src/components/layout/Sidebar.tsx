@@ -2,7 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard, Calendar, Store, Users, Scissors,
   BarChart2, CreditCard, Bell, LogOut,
-  Clock, CheckCircle, X
+  Clock, X
 } from 'lucide-react'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { logout } from '../../features/auth/authSlice'
@@ -30,29 +30,22 @@ const roleMenus: Record<string, SidebarItem[]> = {
     { label: 'Slots', path: '/dashboard/owner/slots', icon: <Clock size={18} /> },
     { label: 'Analytics', path: '/dashboard/owner/analytics', icon: <BarChart2 size={18} /> },
     { label: 'Payments', path: '/dashboard/owner/payments', icon: <CreditCard size={18} /> },
-    { label: 'Browse Salons', path: '/salons', icon: <Store size={18} /> },
-    { label: 'My Appointments', path: '/dashboard/customer/bookings', icon: <Calendar size={18} /> },
   ],
   BARBER: [
     { label: 'Overview', path: '/dashboard/barber', icon: <LayoutDashboard size={18} /> },
-    { label: 'My Bookings', path: '/dashboard/barber/bookings', icon: <Calendar size={18} /> },
-    { label: 'Availability', path: '/dashboard/barber/availability', icon: <CheckCircle size={18} /> },
+    { label: 'My Bookings', path: '/dashboard/barber', icon: <Calendar size={18} /> },
   ],
   ADMIN: [
     { label: 'Overview', path: '/dashboard/admin', icon: <LayoutDashboard size={18} /> },
     { label: 'All Salons', path: '/dashboard/admin/salons', icon: <Store size={18} /> },
     { label: 'Pending Salons', path: '/dashboard/admin/salons/pending', icon: <Clock size={18} /> },
     { label: 'Users', path: '/dashboard/admin/users', icon: <Users size={18} /> },
-    { label: 'Browse Salons', path: '/salons', icon: <Store size={18} /> },
-    { label: 'My Appointments', path: '/dashboard/customer/bookings', icon: <Calendar size={18} /> },
   ],
   SUPERADMIN: [
     { label: 'Overview', path: '/dashboard/admin', icon: <LayoutDashboard size={18} /> },
     { label: 'All Salons', path: '/dashboard/admin/salons', icon: <Store size={18} /> },
     { label: 'Pending Salons', path: '/dashboard/admin/salons/pending', icon: <Clock size={18} /> },
     { label: 'Users', path: '/dashboard/admin/users', icon: <Users size={18} /> },
-    { label: 'Browse Salons', path: '/salons', icon: <Store size={18} /> },
-    { label: 'My Appointments', path: '/dashboard/customer/bookings', icon: <Calendar size={18} /> },
   ],
 }
 
